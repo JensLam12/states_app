@@ -4,7 +4,7 @@ import '../models/user.dart';
 
 class _UserService {
   User? _user;
-  StreamController<User> _userStreamController = StreamController<User>();
+  final StreamController<User> _userStreamController = StreamController<User>.broadcast();
 
   User? get user => _user;
   StreamController<User> get userStream => _userStreamController;
@@ -18,6 +18,10 @@ class _UserService {
   void updateAge(int age) {
     _user!.age = age;
     _userStreamController.add(_user!);
+  }
+
+  dispose() {
+    _userStreamController.close();
   }
 }
 

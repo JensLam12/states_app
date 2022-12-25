@@ -9,7 +9,14 @@ class Screen2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Screen 2'),
+        title: StreamBuilder(
+        stream: userService.userStream.stream,
+        builder: (BuildContext context, AsyncSnapshot<User> snapshot) { 
+          return snapshot.hasData
+            ? Text('Name: ${ snapshot.data?.name}')
+            : const Text('Screen 2');
+         },
+        ),
       ),
       body: Center(
         child: Column(
