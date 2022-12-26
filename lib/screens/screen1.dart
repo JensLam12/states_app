@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:states_app/bloc/user/user_bloc.dart';
+
+import '../models/user.dart';
 
 class Screen1 extends StatelessWidget {
   const Screen1({super.key});
@@ -8,8 +12,21 @@ class Screen1 extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Screen 1'),
+        actions: [
+          IconButton(
+            onPressed: () => BlocProvider.of<UserBloc>(context, listen: false).add( RemoveUser() ),
+            icon: const Icon( Icons.exit_to_app)
+          )
+        ],
       ),
-      body: userInfo(),
+      body: BlocBuilder<UserBloc, UserState>(
+        builder: ((_, state) {
+          return state.existUser
+            ? userInfo(user: state.user!)
+            : const Center( child: Text("There's no user information")
+          );
+        })
+      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon( Icons.accessibility_new),
         onPressed: () => Navigator.pushNamed(context, 'screen2'),
@@ -19,8 +36,9 @@ class Screen1 extends StatelessWidget {
 }
 
 class userInfo extends StatelessWidget {
+  final User user;
   const userInfo({
-    Key? key,
+    Key? key, required this.user,
   }) : super(key: key);
 
   @override
@@ -31,17 +49,17 @@ class userInfo extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('General', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold ) ),
-          Divider(),
-          ListTile( title: Text('Name: ') ),
-          ListTile( title: Text('Edad: ') ),
+        children: [
+          const Text('General', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold ) ),
+          const Divider(),
+          ListTile( title: Text('Name: ${user.name}') ),
+          ListTile( title: Text('Edad: ${user.age}') ),
 
-          Text('Profesiones', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold ) ),
-          Divider(),
-          ListTile( title: Text('Profesion 1') ),
-          ListTile( title: Text('Profesion 2') ),
-          ListTile( title: Text('Profesion 3') ),
+          const Text('Profesiones', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold ) ),
+          const Divider(),
+          ...user.professions.map(
+            (profession) => ListTile( title: Text(profession) )
+          ).toList()
         ],
       ),
     );
